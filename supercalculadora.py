@@ -4,61 +4,43 @@ class Supercalculadora:
 
 	def __init__(self, expr):
 		self.calc = calculadora.Calculadora()
-		self.expr = expr_aritmetica.ExpresionAritmetica()
+		self.parser = expr
 
-	def __resolver_precedencia__(self, exp):
-		operadores = exp['operadores']
-		operandos = exp['operandos']
+	def __operar__(self, expr_descompuesta):
+		i = None
 		res_intermedio = 0
-		nuevos_operandos = operandos
-		nuevos_operadores = operadores
-		eliminar = []
-		res_intermedios = []
-		for i in range(len(operadores)):
-			if operadores[i] == '*':
-				res_intermedio += self.calc.multiplicar(int(operandos[i]), int(operandos[i + 1]))
-				res_intermedios.append(res_intermedio)
-				eliminar.append(i)
-				res_intermedio = 0
-			elif operadores[i] == '/':
-				res_intermedio += self.calc.dividir(int(operandos[i]), int(operandos[i + 1]))
-				res_intermedios.append(res_intermedio)
-				eliminar.append(i)
-				res_intermedio = 0				
 		
-		delta =0
-		for i in range(len(eliminar)):			
-			operandos.pop(eliminar[i] - delta)
-			operandos.pop(eliminar[i] - delta )
-			operandos.insert(eliminar[i], res_intermedios[i])
-			delta += 1
+		if '*' in expr_descompuesta['operadores']:
+			i = expr_descompuesta['operadores'].index('*')
+			res_intermedio = self.calc.multiplicar(expr_descompuesta['operandos'][i],expr_descompuesta['operandos'][i + 1])
+		elif '/' in expr_descompuesta['operadores']:
+			i = expr_descompuesta['operadores'].index('/')
+			res_intermedio = self.calc.dividir(
+			expr_descompuesta['operandos'][i],
+			expr_descompuesta['operandos'][i + 1])
+		elif '-' in expr_descompuesta['operadores']:
+			i = expr_descompuesta['operadores'].index('-')
+			res_intermedio = self.calc.restar(expr_descompuesta['operandos'][i], expr_descompuesta['operandos'][i + 1])
+		elif '+' in expr_descompuesta['operadores']:
+			i = expr_descompuesta['operadores'].index('+')
+			res_intermedio = self.calc.sumar(expr_descompuesta['operandos'][i],expr_descompuesta['operandos'][i + 1])
+		else:
+			# Es un error, tenemos que decidir que hacer en los test
+			# siguientes
+			# Forzamos el error para que no haya problemas luego
+			assert False		
+		return (i, res_intermedio)
 
-		while True:
-			try:
-				operadores.remove('*')
-			except:
-				break
-		while True:
-			try:
-				operadores.remove('/')
-			except:
-				break
-		return res_intermedio
+	def __simplificar__(self, expr_descompuesta):
+		if expr_descompuesta['operadores'] == []:
+			return expr_descompuesta		
+		(i, res_intermedio) = self.__operar__(expr_descompuesta)
+		expr_simplificada = expr_descompuesta
+		expr_simplificada['operadores'].pop(i)
+		expr_simplificada['operandos'].pop(i)
+		expr_simplificada['operandos'].pop(i)
+		expr_simplificada['operandos'].insert(i, res_intermedio)		
+		return self.__simplificar__(expr_simplificada)
 
 	def calcular(self, expresion):
-		exp_limpia = self.expr.parse(expresion)
-		# nos encargamos de resolver primero las divisiones, luego las multiplicaciones y devolvemos resultado
-		res_intermedio = self.__resolver_precedencia__(exp_limpia)
-		res = 0
-		for i in range(len(exp_limpia['operadores'])):
-			if i == 0:
-				res = exp_limpia['operandos'][0]
-			if exp_limpia['operadores'][i] == '+':
-				res = self.calc.sumar(res, exp_limpia['operandos'][i+1])
-			if exp_limpia['operadores'][i] == '-':
-				res = self.calc.restar(res, exp_limpia['operandos'][i+1])
-		return res
-
-if __name__ == '__main__':
-	e = expr_aritmetica.ExpresionAritmetica()
-	s = Supercalculadora(e)
+		return self.__simplificar__(self.parser.parse(expresion))['operandos'][0]

@@ -10,3 +10,6 @@ class Calculadora:
 			raise ValueError
 		
 		return a / b
+
+	def multiplicar(self, a, b):
+		return a * b

@@ -41,6 +41,8 @@ class TestsCalculadora(unittest.TestCase):
 	def test_division_por_cero_excepcion(self):
 		self.failUnlessRaises(ZeroDivisionError, self.calc.dividir, 3,0)
 		
+	def test_multiplicacion_2_y_1(self):
+		self.failUnlessEqual(2, self.calc.multiplicar(2, 1))
 
 if __name__ == '__main__':
 	unittest.main()

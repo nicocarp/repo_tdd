@@ -25,3 +25,16 @@ class TestsSuperCalculadora(unittest.TestCase):
 
 	def test_otra_op_compleja_sin_parentesis_con_precedencia(self):
 		self.failUnlessEqual(8, self.su.calcular("3 + 4 / 2 - 1 + 8 / 2"))
+
+	def test_multiplicacion_simple(self):
+		self.failUnlessEqual(2, self.su.calcular("2 * 1"))
+		self.failUnlessEqual(12, self.su.calcular("4 * 3"))
+	
+	def test_multiplicacion_negativa(self):
+		self.failUnlessEqual(-2, self.su.calcular("2 * -1"))
+
+	def test_multiplicacion_negativa_compleja(self):
+		self.failUnlessEqual(16, self.su.calcular("2 * 2 * 2 * 2"))
+
+	def test_expr_compleja_todas_operaciones_sin_parentesis(self):
+		self.failUnlessEqual(11, self.su.calcular("4 - -3 * 2 / 3 + 5"))
