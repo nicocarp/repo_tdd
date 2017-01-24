@@ -2,14 +2,14 @@ import expr_aritmetica
 import calculadora
 class Supercalculadora:
 
-	def __init__(self, expr):
+	def __init__(self, expr, validador):
 		self.calc = calculadora.Calculadora()
 		self.parser = expr
+		self.validador = validador
 
 	def __operar__(self, expr_descompuesta):
 		i = None
-		res_intermedio = 0
-		
+		res_intermedio = 0		
 		if '*' in expr_descompuesta['operadores']:
 			i = expr_descompuesta['operadores'].index('*')
 			res_intermedio = self.calc.multiplicar(expr_descompuesta['operandos'][i],expr_descompuesta['operandos'][i + 1])
@@ -32,6 +32,7 @@ class Supercalculadora:
 		return (i, res_intermedio)
 
 	def __simplificar__(self, expr_descompuesta):
+
 		if expr_descompuesta['operadores'] == []:
 			return expr_descompuesta		
 		(i, res_intermedio) = self.__operar__(expr_descompuesta)
@@ -43,4 +44,6 @@ class Supercalculadora:
 		return self.__simplificar__(expr_simplificada)
 
 	def calcular(self, expresion):
+		if not self.validador.validar(expresion):
+			raise SyntaxError("La expresion no es valida")
 		return self.__simplificar__(self.parser.parse(expresion))['operandos'][0]
